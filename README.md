@@ -31,15 +31,26 @@ Lossless Summary: Synthesizes all gathered data into a comprehensive final repor
 ⚙️ Installation & Setup
 Clone the repository:
 
-Bash
+```bash```
+```git clone https://github.com/your-username/MADI-Intelligence.git
+cd MADI-Intelligence
+```
+Add your API Key: Open `script.js` and insert your Gemini API Key in the apiKey variable:
 
-git clone https://github.com/your-username/MADI-Intelligence.git
-Add your API Key: Open script.js and insert your Gemini API Key in the apiKey variable:
-
-JavaScript
-
+```JavaScript```
+```
 const apiKey = "YOUR_GEMINI_API_KEY_HERE";
-Launch: Simply open index.html in any modern web browser.
+```
+Launch: Simply open `index.html` in any modern web browser.
+
+📋 Requirements
+To run the MADI Intelligence System, you need:
+
+A modern web browser (Chrome, Edge, or Firefox).
+
+An active internet connection to reach the Google Gemini API.
+
+A valid Google Gemini API Key.
 
 ⚠️ Security Note
 The current implementation stores the API key in a client-side variable for demonstration purposes. For production environments, it is highly recommended to move the callGemini function to a secure backend or use environment variables to prevent API key exposure.
