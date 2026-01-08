@@ -1,0 +1,12 @@
+# API Keys and Secrets
+# It is best practice to keep keys out of version control
+.env
+config.js
+
+# OS Metadata
+.DS_Store
+Thumbs.db
+
+# Documentation / Drafts
+MADI.txt
+*.log
