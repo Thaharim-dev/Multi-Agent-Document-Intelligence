@@ -14,21 +14,24 @@ Visual Intelligence (VRDU): Audits document coordinates to identify stamps and s
 Real-time System Console: Provides a "kernel-style" log of agent activities and pipeline status.
 Responsive Glassmorphism UI: A modern, high-tech interface built with Tailwind CSS and custom animations.
 
-🛠️ Tech Stack
-Logic: JavaScript (ES6+) 
+🛠️ Tech Stack Logic
+JavaScript (ES6+) 
 AI Engine: Google Gemini 2.5 Flash Preview 
 Styling: Tailwind CSS 
 Fonts: Space Grotesk & JetBrains Mono 
 
 📋 Pipeline Protocol
+
 The system executes the following sequence to ensure data integrity:
-VRDU Analysis: Analyzes the visual layout for non-textual elements like signatures and stamps.
-OCR & Digitization: Performs high-precision reconstruction of all text, including handwriting.
-Layout Detection: Maps the logical structure based on headers, columns, and sections
-Data Extraction: Targeted extraction of entities like Names, IDs, Dates, and Prices.
-Lossless Summary: Synthesizes all gathered data into a comprehensive final report.
+
+1. VRDU Analysis: Analyzes the visual layout for non-textual elements like signatures and stamps.
+2. OCR & Digitization: Performs high-precision reconstruction of all text, including handwriting.
+3. Layout Detection: Maps the logical structure based on headers, columns, and sections
+4. Data Extraction: Targeted extraction of entities like Names, IDs, Dates, and Prices.
+5. Lossless Summary: Synthesizes all gathered data into a comprehensive final report.
 
 ⚙️ Installation & Setup
+
 Clone the repository:
 
 ```bash```
@@ -41,16 +44,14 @@ Add your API Key: Open `script.js` and insert your Gemini API Key in the apiKey 
 ```
 const apiKey = "YOUR_GEMINI_API_KEY_HERE";
 ```
-Launch: Simply open `index.html` in any modern web browser.
+Launch: Open `index.html` in any modern web browser.
 
 📋 Requirements
-To run the MADI Intelligence System, you need:
 
-A modern web browser (Chrome, Edge, or Firefox).
-
-An active internet connection to reach the Google Gemini API.
-
-A valid Google Gemini API Key.
+1. To run the MADI Intelligence System, you need:
+2. A modern web browser (Chrome, Edge, or Firefox).
+3. An active internet connection to reach the Google Gemini API.
+4. A valid Google Gemini API Key.
 
 ⚠️ Security Note
 The current implementation stores the API key in a client-side variable for demonstration purposes. For production environments, it is highly recommended to move the callGemini function to a secure backend or use environment variables to prevent API key exposure.
