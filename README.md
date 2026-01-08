@@ -35,7 +35,8 @@ The system executes the following sequence to ensure data integrity:
 Clone the repository:
 
 ```bash```
-```git clone https://github.com/your-username/MADI-Intelligence.git
+```
+git clone https://github.com/Thaharim-dev/MADI-Intelligence.git
 cd MADI-Intelligence
 ```
 Add your API Key: Open `script.js` and insert your Gemini API Key in the apiKey variable:
