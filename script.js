@@ -1,153 +1,168 @@
-/** * SECURITY NOTE: Do not hardcode your API Key when pushing to GitHub. 
- * Use an environment variable or a config file that is gitignored.
- */
-[cite_start]const apiKey = ""; [cite: 48]
-let pdfBase64 = "";
-let selectedFile = null;
+    // CRITICAL: Replace the empty string below with your Google AI Studio API key
+        // Get one at: https://aistudio.google.com/app/apikey
+        const apiKey = ""; 
 
-const el = {
-    input: document.getElementById('file-input'),
-    zone: document.getElementById('upload-zone'),
-    startBtn: document.getElementById('start-btn'),
-    terminal: document.getElementById('terminal'),
-    loader: document.getElementById('global-loader'),
-    results: document.getElementById('results'),
-    summary: document.getElementById('summary-content'),
-    [cite_start]digit: document.getElementById('digit-content'), [cite: 50]
-    meta: document.getElementById('meta-content')
-};
+        const model = "gemini-2.5-flash-preview-09-2025";
+        let selectedFile = null;
 
-[cite_start]el.zone.onclick = () => el.input.click(); [cite: 51]
-el.input.onchange = (e) => {
-    const file = e.target.files[0];
-    [cite_start]if (file) handleFile(file); [cite: 52]
-};
+        // UI Handlers
+        const fileInput = document.getElementById('file-input');
+        const uploadZone = document.getElementById('upload-zone');
+        const startBtn = document.getElementById('start-btn');
+        const terminal = document.getElementById('terminal');
+        const statusEl = document.getElementById('status');
 
-function handleFile(file) {
-    selectedFile = file;
-    [cite_start]document.getElementById('upload-prompt').classList.add('hidden'); [cite: 53]
-    document.getElementById('file-display').classList.remove('hidden');
-    document.getElementById('filename').textContent = file.name;
-    el.startBtn.disabled = false;
-    el.startBtn.classList.replace('bg-slate-800', 'bg-blue-600');
-    el.startBtn.classList.replace('text-slate-500', 'text-white');
-    el.startBtn.classList.add('hover:bg-blue-500', 'cursor-pointer');
-    log(`Document loaded: ${file.name}`, 'text-blue-400');
-
-    [cite_start]const reader = new FileReader(); [cite: 54]
-    reader.onload = (e) => { pdfBase64 = e.target.result.split(',')[1]; };
-    reader.readAsDataURL(file);
-}
-
-function clearFile() {
-    selectedFile = null;
-    [cite_start]pdfBase64 = ""; [cite: 56]
-    el.input.value = "";
-    document.getElementById('upload-prompt').classList.remove('hidden');
-    document.getElementById('file-display').classList.add('hidden');
-    el.startBtn.disabled = true;
-    el.results.classList.add('hidden');
-    log('Buffer cleared.', 'text-slate-500');
-}
-
-function log(msg, cls = 'text-slate-400') {
-    const div = document.createElement('div');
-    [cite_start]div.className = `log-line ${cls}`; [cite: 58]
-    div.innerHTML = `<span class="opacity-30">[${new Date().toLocaleTimeString()}]</span> ${msg}`;
-    el.terminal.appendChild(div);
-    el.terminal.scrollTop = el.terminal.scrollHeight;
-}
-
-async function callGemini(prompt, retries = 5) {
-    [cite_start]const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`; [cite: 60]
-    for (let i = 0; i < retries; i++) {
-        try {
-            const response = await fetch(url, {
-                method: 'POST',
-                [cite_start]headers: { 'Content-Type': 'application/json' }, [cite: 61]
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [
-                            [cite_start]{ text: prompt }, [cite: 62]
-                            { inlineData: { mimeType: "application/pdf", data: pdfBase64 } }
-                        ]
-                    }]
-                })
-            });
-
-            if (response.ok) {
-                [cite_start]const data = await response.json(); [cite: 65]
-                return data.candidates?.[0]?.content?.parts?.[0]?.text || "No response content.";
+        uploadZone.onclick = () => fileInput.click();
+        fileInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file && file.type === 'application/pdf') {
+                selectedFile = file;
+                document.getElementById('upload-prompt').classList.add('hidden');
+                document.getElementById('file-display').classList.remove('hidden');
+                document.getElementById('filename').textContent = file.name;
+                startBtn.disabled = false;
+                startBtn.className = "w-full py-4 rounded-xl font-bold text-lg transition-all bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/20";
+                log(`File staged: ${file.name}`, 'text-blue-400');
             }
+        };
 
-            if (response.status === 401) {
-                throw new Error("Unauthorized (401). Ensure API context is correctly initialized.");
-            }
-
-            [cite_start]const delay = Math.pow(2, i) * 1000; [cite: 67]
-            await new Promise(resolve => setTimeout(resolve, delay));
-        } catch (err) {
-            if (i === retries - 1) throw err;
+        function clearFile() {
+            selectedFile = null;
+            fileInput.value = '';
+            document.getElementById('upload-prompt').classList.remove('hidden');
+            document.getElementById('file-display').classList.add('hidden');
+            startBtn.disabled = true;
+            startBtn.className = "w-full py-4 rounded-xl font-bold text-lg transition-all bg-white/5 text-white/20 cursor-not-allowed";
         }
-    }
-}
 
-function setAgent(id, status) {
-    [cite_start]const card = document.querySelector(`[data-agent="${id}"]`); [cite: 69]
-    if (!card) return;
-    card.classList.remove('opacity-50', 'active', 'complete');
-    if (status === 'active') card.classList.add('active');
-    if (status === 'complete') card.classList.add('complete');
-}
+        function log(msg, color = 'text-white/60') {
+            const div = document.createElement('div');
+            div.className = `${color} leading-relaxed`;
+            div.innerHTML = `<span class="opacity-20 mr-2">${new Date().toLocaleTimeString()}</span> ${msg}`;
+            terminal.appendChild(div);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
 
-async function startProcessing() {
-    [cite_start]if (!pdfBase64) return; [cite: 71]
-    el.startBtn.disabled = true;
-    el.loader.classList.remove('hidden');
-    el.results.classList.add('hidden');
-    el.terminal.innerHTML = "";
-    log('Initializing 5-Stage MADI Lossless Pipeline...', 'text-white font-bold');
+        async function callGemini(prompt, pdfData = null) {
+            // Check if API Key is missing for local dev
+            if (!apiKey || apiKey === "") {
+                throw new Error("Missing API Key. Please add your key to the 'apiKey' variable in the source code.");
+            }
 
-    try {
-        [cite_start]setAgent('vrdu', 'active'); [cite: 73]
-        log('AGENT 01 (VRDU): Auditing visual coordinates...');
-        await callGemini("Analyze the visual layout. Find all stamps, signatures, and document sections.");
-        setAgent('vrdu', 'complete');
-        log('✓ Visual Audit: Successful.', 'text-green-500');
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+            
+            const contents = [{
+                parts: [
+                    { text: prompt },
+                    ...(pdfData ? [{ inlineData: { mimeType: "application/pdf", data: pdfData } }] : [])
+                ]
+            }];
 
-        [cite_start]setAgent('digitization', 'active'); [cite: 75]
-        log('AGENT 02 (Digitization): Running high-precision OCR and handwriting reconstruction...');
-        const digitText = await callGemini("Act as a Document Digitization Agent. Extract all text verbatim. Explicitly transcribe any handwritten annotations, marginalia, or stamped numbers found on the page.");
-        el.digit.textContent = digitText;
-        setAgent('digitization', 'complete');
-        log('✓ Digitization: Lossless text stream generated.', 'text-purple-400');
+            const maxRetries = 5;
+            let lastError = null;
 
-        [cite_start]setAgent('layout', 'active'); [cite: 78]
-        log('AGENT 03 (Layout): Mapping logical structure...');
-        await callGemini("Define the logical structure of this document based on headers and columns.");
-        setAgent('layout', 'complete');
-        log('✓ Layout mapping: Complete.', 'text-green-500');
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ contents })
+                    });
 
-        [cite_start]setAgent('extraction', 'active'); [cite: 80]
-        log('AGENT 04 (Extraction): Extracting verified data points...');
-        const metaText = await callGemini(`Extract specific entities: Names, ID numbers, Dates, and Prices. Use this digitized text as your source: ${digitText.substring(0, 500)}`);
-        el.meta.textContent = metaText;
-        setAgent('extraction', 'complete');
-        log('✓ Entity extraction: Verified.', 'text-green-500');
+                    const responseText = await response.text();
+                    
+                    if (!response.ok) {
+                        let errorMsg = `HTTP ${response.status}`;
+                        try {
+                            const errorJson = JSON.parse(responseText);
+                            errorMsg = errorJson.error?.message || errorMsg;
+                        } catch(e) {}
+                        throw new Error(errorMsg);
+                    }
 
-        [cite_start]setAgent('summary', 'active'); [cite: 83]
-        log('AGENT 05 (Summary): Synthesizing final report...');
-        const summary = await callGemini("Provide a comprehensive summary. Ensure information from handwritten notes is included.");
-        el.summary.innerHTML = summary.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-        setAgent('summary', 'complete');
+                    const data = JSON.parse(responseText);
+                    const output = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                    
+                    if (output === undefined) throw new Error("API returned empty content candidate");
+                    return output;
 
-        el.results.classList.remove('hidden');
-        log('PIPELINE SUCCESS: Documents fully digitized.', 'text-blue-400 font-bold');
-    } catch (err) {
-        log(`PIPELINE ERROR: ${err.message}`, 'text-red-500 font-bold');
-        console.error(err);
-    } finally {
-        [cite_start]el.loader.classList.add('hidden'); [cite: 87]
-        el.startBtn.disabled = false;
-    }
-}
+                } catch (err) {
+                    lastError = err;
+                    if (i < maxRetries - 1) {
+                        const delay = Math.pow(2, i) * 1000;
+                        await new Promise(r => setTimeout(r, delay));
+                    }
+                }
+            }
+            throw lastError;
+        }
+
+        async function startProcessing() {
+            if (!selectedFile) return;
+
+            // Reset UI
+            startBtn.disabled = true;
+            document.getElementById('results').classList.add('hidden');
+            document.querySelectorAll('.agent-card').forEach(c => c.className = 'agent-card rounded-xl p-4 flex items-center');
+            terminal.innerHTML = '';
+            
+            log('Initializing multi-agent protocol...', 'text-blue-400 font-bold');
+            statusEl.textContent = 'Active';
+
+            try {
+                const reader = new FileReader();
+                const base64Promise = new Promise((resolve) => {
+                    reader.onload = () => resolve(reader.result.split(',')[1]);
+                    reader.readAsDataURL(selectedFile);
+                });
+                const pdfBase64 = await base64Promise;
+
+                const pipeline = [
+                    { id: 'vrdu', label: 'VRDU Agent', prompt: 'Analyze the document visual layout, identifying headers, footers, tables, and paragraphs.' },
+                    { id: 'layout', label: 'Layout Analysis', prompt: 'Structure the following visual data into a logical reading sequence.' },
+                    { id: 'extraction', label: 'Extraction', prompt: 'Extract all semantic data from this document based on the following structure.' },
+                    { id: 'digitization', label: 'Digitization', prompt: 'Normalize all extracted data into a cohesive markdown-style format.' },
+                    { id: 'summary', label: 'Summarization', prompt: 'Provide a clear, executive-level summary of the provided text.' }
+                ];
+
+                let context = "";
+                const results = {};
+
+                for (const stage of pipeline) {
+                    const card = document.querySelector(`[data-agent="${stage.id}"]`);
+                    card.classList.add('active');
+                    statusEl.textContent = `Running: ${stage.label}`;
+                    log(`Invoking ${stage.label}...`);
+
+                    const fullPrompt = stage.id === 'vrdu' ? stage.prompt : `${stage.prompt}\n\nPrevious Analysis:\n${context}`;
+                    const usePdf = ['vrdu', 'extraction'].includes(stage.id);
+                    
+                    results[stage.id] = await callGemini(fullPrompt, usePdf ? pdfBase64 : null);
+                    context = results[stage.id];
+
+                    card.classList.replace('active', 'complete');
+                    log(`✓ ${stage.label} successful`, 'text-green-400');
+                }
+
+                log('Running Final Verification...', 'text-purple-400');
+                const [evaluation, bias] = await Promise.all([
+                    callGemini(`Evaluate the following extraction for completeness and accuracy: ${results.digitization}`),
+                    callGemini(`Check for potential bias or missed critical information in this summary: ${results.summary}`)
+                ]);
+
+                document.getElementById('summary-content').textContent = results.summary;
+                document.getElementById('eval-content').textContent = evaluation;
+                document.getElementById('bias-content').textContent = bias;
+                document.getElementById('results').classList.remove('hidden');
+                
+                log('Pipeline execution complete.', 'text-green-400 font-bold');
+                statusEl.textContent = 'Standby';
+                startBtn.disabled = false;
+
+            } catch (err) {
+                log(`CRITICAL ERROR: ${err.message}`, 'text-red-400 font-bold');
+                statusEl.textContent = 'Failed';
+                startBtn.disabled = false;
+                document.querySelector('.agent-card.active')?.classList.add('border-red-500', 'bg-red-500/10');
+            }
+        }
