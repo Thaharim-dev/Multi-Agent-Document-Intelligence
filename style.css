@@ -1,75 +1,66 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
 
-body { 
-    [cite_start]font-family: 'Space Grotesk', sans-serif; [cite: 2]
-    [cite_start]background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); [cite: 3]
-    min-height: 100vh;
-    color: white;
-}
+      
+        
+        body { 
+            font-family: 'Space Grotesk', sans-serif; 
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        
+        .terminal-font { font-family: 'JetBrains Mono', monospace; }
+        
+        .agent-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .agent-card.active {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: #3b82f6;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+            transform: translateX(4px);
+        }
+        
+        .agent-card.complete {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: #10b981;
+        }
+        
+        .upload-zone {
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.02);
+            transition: all 0.2s ease;
+        }
+        
+        .upload-zone:hover {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.05);
+        }
 
-.glass-card {
-    background: rgba(255, 255, 255, 0.03);
-    [cite_start]backdrop-filter: blur(12px); [cite: 5]
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    [cite_start]box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); [cite: 6]
-}
+        .pulse-dot {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+        
+        .gradient-text {
+            background: linear-gradient(90deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-.terminal-font { font-family: 'JetBrains Mono', monospace; [cite_start]} [cite: 7]
-
-.agent-card {
-    background: rgba(255, 255, 255, 0.05);
-    [cite_start]border: 1px solid rgba(255, 255, 255, 0.1); [cite: 8]
-    transition: all 0.3s ease;
-}
-
-.agent-card.active {
-    background: rgba(59, 130, 246, 0.2);
-    [cite_start]border-color: #3b82f6; [cite: 10]
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
-    [cite_start]transform: translateX(8px); [cite: 11]
-}
-
-.agent-card.complete {
-    background: rgba(16, 185, 129, 0.2);
-    [cite_start]border-color: #10b981; [cite: 12]
-}
-
-.upload-zone {
-    border: 2px dashed rgba(255, 255, 255, 0.2);
-    [cite_start]background: rgba(255, 255, 255, 0.02); [cite: 13]
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.upload-zone:hover {
-    border-color: #3b82f6;
-    [cite_start]background: rgba(59, 130, 246, 0.05); [cite: 15]
-}
-
-.log-line {
-    animation: slideIn 0.2s ease-out;
-    [cite_start]margin-bottom: 4px; [cite: 16]
-}
-
-@keyframes slideIn {
-    from { opacity: 0; transform: translateX(-10px); [cite_start]} [cite: 17]
-    to { opacity: 1; transform: translateX(0); [cite_start]} [cite: 18]
-}
-
-.loader {
-    border: 2px solid rgba(255,255,255,0.1);
-    [cite_start]border-top: 2px solid #3b82f6; [cite: 19]
-    border-radius: 50%;
-    width: 16px;
-    height: 16px;
-    [cite_start]animation: spin 1s linear infinite; [cite: 20]
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); [cite_start]} [cite: 21]
-    100% { transform: rotate(360deg); [cite_start]} [cite: 22]
-}
-
-::-webkit-scrollbar { width: 6px; [cite_start]} [cite: 23]
-::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); [cite_start]} [cite: 24]
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; [cite_start]} [cite: 25]
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
